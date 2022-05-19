@@ -159,6 +159,7 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 			"azp":   "EuF4nRe3111vAMZKdYMxGdKD3Qzl1WbI",
 			"scope": "openid profile email offline_access",
 		})
+		token.Header["kid"] = "01G3C03T53EN3PGS6DAPMHV3FG"
 		signed, err := token.SignedString(privateKey)
 		if err != nil {
 			log.Fatal(err)
@@ -175,6 +176,7 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 			"email": user,
 			"nonce": nonce,
 		})
+		idtoken.Header["kid"] = "01G3C03T53EN3PGS6DAPMHV3FG"
 		idsigned, err := idtoken.SignedString(privateKey)
 		if err != nil {
 			log.Fatal(err)

@@ -11,4 +11,8 @@ FROM alpine@sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9
 RUN apk update && apk add --no-cache dumb-init
 WORKDIR /app
 COPY --from=build /app/bin/server ./server
+COPY --from=build /app/jwks.json ./jwks.json
+COPY --from=build /app/openid-configuration.json ./openid-configuration.json
+COPY --from=build /app/private.pem ./private.pem
+COPY --from=build /app/public.pem ./public.pem
 CMD ["dumb-init", "/app/server"]

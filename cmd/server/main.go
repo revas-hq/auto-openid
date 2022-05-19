@@ -23,7 +23,15 @@ import (
 )
 
 func main() {
-	baseURL, _ := url.Parse("http://localhost:8080")
+	bu := os.Getenv("BASE_URL")
+	if bu == "" {
+		bu = "http://localhost:8080"
+		log.Printf("defaulting to base url %s", bu)
+	}
+	baseURL, err := url.Parse(bu)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	nonceCache := &sync.Map{}
 

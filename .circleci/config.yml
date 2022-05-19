@@ -1,0 +1,39 @@
+version: 2.1
+
+orbs:
+  gcp-cli: circleci/gcp-cli@2.4.0
+  gcp-gcr: circleci/gcp-gcr@0.15.0
+
+jobs:
+  deploy-cloud-run:
+    executor: gcp-cli/default
+    steps:
+      - gcp-cli/install
+      - gcp-cli/initialize
+      - run: >
+          $SUDO gcloud run deploy auto-openid
+          --image eu.gcr.io/$GOOGLE_PROJECT_ID/auto-openid:latest
+          --allow-unauthenticated
+          --platform managed
+          --project $GOOGLE_PROJECT_ID
+          --region europe-west1
+#          --region $GOOGLE_COMPUTE_REGION
+workflows:
+  build-test-deploy:
+    jobs:
+      - gcp-gcr/build-and-push-image:
+          context: revas-os-prod
+          name: build_docker_image
+          image: auto-openid
+          registry-url: eu.gcr.io
+          filters:
+            branches:
+              only: main
+      - deploy-cloud-run:
+          context: revas-os-prod
+          name: deploy_cloud_run
+          requires:
+            - build_docker_image
+          filters:
+            branches:
+              only: main

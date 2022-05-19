@@ -202,7 +202,7 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 			AccessToken:  signed,
 			TokenType:    "Bearer",
 			RefreshToken: "8xLOxBtZp8",
-			ExpiresIn:    time.Now().Add(time.Hour).Unix(),
+			ExpiresIn:    int64(duration.Seconds()),
 			IDToken:      idsigned,
 		})
 	}

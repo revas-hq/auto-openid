@@ -135,9 +135,19 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 		r.ParseForm()
 		code := r.Form.Get("code")
 
-		user := mux.Vars(r)["dash"]
-		user = strings.Replace(user, "-dot-", ".", -1)
-		user = strings.Replace(user, "-at-", "@", -1)
+		dash := mux.Vars(r)["dash"]
+		dash = strings.Replace(dash, "-dot-", ".", -1)
+		dash = strings.Replace(dash, "-at-", "@", -1)
+		data := strings.Split(dash, "-for-")
+		user := data[0]
+		duration := time.Hour
+		if len(data) == 2 {
+			d, err := time.ParseDuration(data[1])
+			if err != nil {
+				panic(err)
+			}
+			duration = d
+		}
 
 		h := fnv.New32a()
 		h.Write([]byte(mux.Vars(r)["dash"]))
@@ -155,7 +165,7 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 				"https://revas-os.eu.auth0.com/userinfo",
 			},
 			"iat":   time.Now().Unix(),
-			"exp":   time.Now().Add(time.Hour).Unix(),
+			"exp":   time.Now().Add(duration).Unix(),
 			"azp":   "EuF4nRe3111vAMZKdYMxGdKD3Qzl1WbI",
 			"scope": "openid profile email offline_access",
 		})
@@ -172,7 +182,7 @@ func NewTokenHandlerFunc(baseURL *url.URL, nonceCache *sync.Map) http.HandlerFun
 			"sub":   sub,
 			"aud":   "client",
 			"iat":   time.Now().Unix(),
-			"exp":   time.Now().Add(time.Hour).Unix(),
+			"exp":   time.Now().Add(duration).Unix(),
 			"email": user,
 			"nonce": nonce,
 		})
